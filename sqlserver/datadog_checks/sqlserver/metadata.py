@@ -15,6 +15,7 @@ from datadog_checks.sqlserver.const import (
     DEFAULT_SCHEMAS_COLLECTION_INTERVAL,
 )
 from datadog_checks.sqlserver.schemas import SQLServerSchemaCollector
+from datadog_checks.sqlserver.views import SQLServerViewCollector
 
 try:
     import datadog_agent
@@ -86,6 +87,7 @@ class SqlserverMetadata(DBMAsyncJob):
         self._time_since_last_settings_query = 0
         self._max_query_metrics = self._config.statement_metrics_config.get("max_queries", 250)
         self._schema_collector = SQLServerSchemaCollector(check)
+        self._view_collector = SQLServerViewCollector(check)
         self._schema_config = self._config.schema_config
         self._schema_collection_interval = self._schema_config.get(
             'collection_interval', DEFAULT_SCHEMAS_COLLECTION_INTERVAL
@@ -168,3 +170,4 @@ class SqlserverMetadata(DBMAsyncJob):
             return
         self._last_schemas_collection_time = time.time()
         self._schema_collector.collect_schemas()
+        self._view_collector.collect_schemas()
